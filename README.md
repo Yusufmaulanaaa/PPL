@@ -62,6 +62,20 @@ tests/test_login.py::TestLogin::test_login_negative_empty_password PASSED [100%]
 
 Hasil: **5 passed** — semua test case lolos.
 
+## Tabel Identifikasi Relative XPath
+
+| No | Elemen | Relative XPath | Penjelasan | File |
+|----|--------|----------------|------------|------|
+| 1 | Username Input | `//input[@id='user-name' or @data-test='username']` | Field input untuk memasukkan username login | login_page.py |
+| 2 | Password Input | `//input[@id='password' or @data-test='password']` | Field input untuk memasukkan password login | login_page.py |
+| 3 | Login Button | `//input[@type='submit' and @id='login-button']` | Tombol untuk submit form login | login_page.py |
+| 4 | Error Container | `//h3[@data-test='error' or contains(@class, 'error-message')]` | Area pesan kesalahan saat login gagal | login_page.py |
+| 5 | App Logo | `//div[@class='app_logo' and text()='Swag Labs']` | Logo Swag Labs sebagai penanda halaman | login_page.py |
+| 6 | Add Backpack Button | `//button[contains(@data-test,'add-to-cart-sauce-labs-backpack')]` | Tombol untuk menambahkan backpack ke keranjang | inventory_page.py |
+| 7 | Cart Badge | `//span[@data-test='shopping-cart-badge' or contains(@class,'shopping_cart_badge')]` | Badge yang menampilkan jumlah item di keranjang | inventory_page.py |
+| 8 | Burger Menu Button | `//button[@id='react-burger-menu-btn']` | Tombol untuk membuka sidebar menu | inventory_page.py |
+| 9 | Logout Link | `//a[@id='logout_sidebar_link']` | Link untuk logout dari sidebar menu | inventory_page.py |
+
 ## Diupload oleh
 
 Yusufmaulanaa (yusufmaulanasyifa25@gmail.com) ke repositori GitHub.
