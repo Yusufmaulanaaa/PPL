@@ -1,6 +1,6 @@
 # SauceDemo Automation (Selenium + pytest + POM)
 
-Otomasi pengujian UI untuk https://www.saucedemo.com/ dengan Page Object Model.
+Otomasi pengujian UI untuk https://www.saucedemo.com/ dengan Page Object Model (POM). Tugas Praktikum Pertemuan 7, mata kuliah Pengujian Perangkat Lunak (TI505).
 
 ## Anggota Kelompok
 
@@ -10,18 +10,46 @@ Otomasi pengujian UI untuk https://www.saucedemo.com/ dengan Page Object Model.
 | Yusuf Maulana Syifa | 24090087 |
 | Mustofa Achmad | 24090102 |
 
-## Struktur
+## Struktur Proyek
 
-- `pages/`  : Page Object (locator Relative XPath + aksi)
-  - `base_page.py` : class induk, explicit wait dan aksi dasar Selenium
-  - `login_page.py` : halaman login
-  - `inventory_page.py` : halaman inventory
-- `tests/`  : Skrip uji + assertions
-  - `test_login.py` : 3 test login
-  - `test_inventory.py` : test add to cart dan logout
-- `conftest.py` : fixture browser
+```
+PPL/
+├── pages/
+│   ├── __init__.py
+│   ├── base_page.py      # Class induk, explicit wait, aksi dasar Selenium
+│   ├── login_page.py     # Page Object halaman login
+│   └── inventory_page.py # Page Object halaman inventory
+├── tests/
+│   ├── __init__.py
+│   ├── test_login.py     # 3 test login (positif + 2 negatif)
+│   └── test_inventory.py # Test add to cart dan logout
+├── conftest.py           # Fixture browser (driver Chrome per fungsi)
+├── pytest.ini            # Konfigurasi pytest
+├── requirements.txt      # Dependensi: selenium, pytest
+└── README.md
+```
 
-## Cara menjalankan
+## Page Object Model
+
+Setiap halaman web direpresentasikan oleh satu class di folder `pages/`:
+
+- **`BasePage`** (`base_page.py`): Kelas induk dengan explicit wait (10 detik), aksi klik, input teks, ambil teks, dan ambil URL. Tidak ada `time.sleep()`.
+- **`LoginPage`** (`login_page.py`): Lokator dan aksi untuk halaman login (input username, password, tombol login, pesan error, logo).
+- **`InventoryPage`** (`inventory_page.py`): Lokator dan aksi untuk halaman inventory (add to cart, badge keranjang, burger menu, logout).
+
+Semua locator menggunakan Relative XPath, tidak ada absolute XPath. Tidak ada locator yang ditulis langsung di file test.
+
+## Test Case
+
+| No | Test | Yang Dicek |
+|----|------|------------|
+| 1 | `test_login_positive_valid_user` | Login valid, URL pindah ke inventory dan logo tampil |
+| 2 | `test_login_negative_locked_out_user` | Pesan error untuk akun yang diblokir |
+| 3 | `test_login_negative_empty_password` | Pesan error saat password kosong |
+| 4 | `test_add_backpack_to_cart` | Badge keranjang jadi 1 setelah Add to cart |
+| 5 | `test_logout` | Kembali ke halaman login dan tombol login tampil |
+
+## Cara Menjalankan
 
 Butuh Python 3.10+ dan Google Chrome.
 
@@ -29,13 +57,24 @@ Butuh Python 3.10+ dan Google Chrome.
 python -m venv venv
 # Windows: .\venv\Scripts\Activate.ps1   |   Linux/macOS: source venv/bin/activate
 pip install -r requirements.txt
-pytest -v
+py -m pytest -v
 ```
 
-## Catatan
+Hasil yang diharapkan: **5 passed**.
 
-- Tidak memakai absolute XPath dan tidak memakai `time.sleep()`, waktu tunggu pakai explicit wait di `BasePage`.
-- Semua locator ada di folder `pages/`, tidak ada locator di file test.
+## Tabel Identifikasi Relative XPath
+
+| No | Elemen | Relative XPath | Penjelasan | File |
+|----|--------|----------------|------------|------|
+| 1 | Username Input | `//input[@id='user-name' or @data-test='username']` | Field input untuk memasukkan username login | login_page.py |
+| 2 | Password Input | `//input[@id='password' or @data-test='password']` | Field input untuk memasukkan password login | login_page.py |
+| 3 | Login Button | `//input[@type='submit' and @id='login-button']` | Tombol untuk submit form login | login_page.py |
+| 4 | Error Container | `//h3[@data-test='error' or contains(@class, 'error-message')]` | Area pesan kesalahan saat login gagal | login_page.py |
+| 5 | App Logo | `//div[@class='app_logo' and text()='Swag Labs']` | Logo Swag Labs sebagai penanda halaman | login_page.py |
+| 6 | Add Backpack Button | `//button[contains(@data-test,'add-to-cart-sauce-labs-backpack')]` | Tombol untuk menambahkan backpack ke keranjang | inventory_page.py |
+| 7 | Cart Badge | `//span[@data-test='shopping-cart-badge' or contains(@class,'shopping_cart_badge')]` | Badge yang menampilkan jumlah item di keranjang | inventory_page.py |
+| 8 | Burger Menu Button | `//button[@id='react-burger-menu-btn']` | Tombol untuk membuka sidebar menu | inventory_page.py |
+| 9 | Logout Link | `//a[@id='logout_sidebar_link']` | Link untuk logout dari sidebar menu | inventory_page.py |
 
 ## Hasil Test
 
@@ -62,20 +101,11 @@ tests/test_login.py::TestLogin::test_login_negative_empty_password PASSED [100%]
 
 Hasil: **5 passed** — semua test case lolos.
 
-## Tabel Identifikasi Relative XPath
+## Catatan
 
-| No | Elemen | Relative XPath | Penjelasan | File |
-|----|--------|----------------|------------|------|
-| 1 | Username Input | `//input[@id='user-name' or @data-test='username']` | Field input untuk memasukkan username login | login_page.py |
-| 2 | Password Input | `//input[@id='password' or @data-test='password']` | Field input untuk memasukkan password login | login_page.py |
-| 3 | Login Button | `//input[@type='submit' and @id='login-button']` | Tombol untuk submit form login | login_page.py |
-| 4 | Error Container | `//h3[@data-test='error' or contains(@class, 'error-message')]` | Area pesan kesalahan saat login gagal | login_page.py |
-| 5 | App Logo | `//div[@class='app_logo' and text()='Swag Labs']` | Logo Swag Labs sebagai penanda halaman | login_page.py |
-| 6 | Add Backpack Button | `//button[contains(@data-test,'add-to-cart-sauce-labs-backpack')]` | Tombol untuk menambahkan backpack ke keranjang | inventory_page.py |
-| 7 | Cart Badge | `//span[@data-test='shopping-cart-badge' or contains(@class,'shopping_cart_badge')]` | Badge yang menampilkan jumlah item di keranjang | inventory_page.py |
-| 8 | Burger Menu Button | `//button[@id='react-burger-menu-btn']` | Tombol untuk membuka sidebar menu | inventory_page.py |
-| 9 | Logout Link | `//a[@id='logout_sidebar_link']` | Link untuk logout dari sidebar menu | inventory_page.py |
+- Tidak memakai absolute XPath dan tidak memakai `time.sleep()`, waktu tunggu pakai explicit wait di `BasePage`.
+- Semua lokator ada di folder `pages/`, tidak ada lokator di file test.
 
-## Diupload oleh
+## Diupload Oleh
 
-Yusufmaulanaa (yusufmaulanasyifa25@gmail.com) ke repositori GitHub.
+Mustofa Achmad (24090102) ke repositori GitHub.
